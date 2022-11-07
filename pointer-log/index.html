@@ -75,6 +75,7 @@
                 <div>Buttons</div>
                 <div>Pressure</div>
                 <div>Timestamp</div>
+                <div>Is Coalesced</div>
             </div>
             <div class="event-row"
                 v-for="event in events">
@@ -88,6 +89,7 @@
                 <div>{{event.buttons}}</div>
                 <div>{{event.pressure}}</div>
                 <div>{{event.timeStamp}}</div>
+                <div>{{event.isCoalesced}}</div>
             </div>
         </div>
     </div>
@@ -123,12 +125,14 @@
                                 if (e.getCoalescedEvents) {
                                     const coalescedEvents = e.getCoalescedEvents()
                                     for (const coalescedEvent of coalescedEvents) {
-                                        coalescedEvent.targetName = e.targetName
-                                        this.events.unshift(coalescedEvent)                        
+                                        if (coalescedEvent.timeStamp !== e.timeStamp) {
+                                            coalescedEvent.targetName = e.targetName
+                                            coalescedEvent.isCoalesced = true
+                                            this.events.unshift(coalescedEvent)
+                                        }
                                     }
-                                } else {
-                                    this.events.unshift(e)                                      
                                 }
+                                this.events.unshift(e)
                             }
                             break
                         case "pointerrawupdate":
